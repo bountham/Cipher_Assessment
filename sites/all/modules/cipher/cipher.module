@@ -1,0 +1,94 @@
+<?php
+
+function cipher_menu() {
+    $items['cipher'] = array(
+        'title' => 'Cipher',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('cipher_form'),
+        'access callback' => TRUE,
+        'type' => MENU_NORMAL_ITEM,
+    );
+    $items['result'] = array(
+        'title' => 'Your Result',
+        'page callback' => 'cipher_result',
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+    );
+    return $items;
+}
+
+function cipher_form() {
+    $direction = array( 1=> 'left', 2 => 'right');
+
+    $form['shift_value'] = array(
+        '#title' => 'Shift Value',
+        '#type' => 'textfield',
+        '#description' => t('Please enter your shift value.'),
+        '#element_validate' => array('element_validate_integer_positive'),
+        '#required' => TRUE,
+
+    );
+
+    $form['direction'] = array(
+        '#title' => 'Shift Direction',
+        '#type' => 'select',
+        '#options' => $direction,
+        '#description' => t('Please select shift direction.'),
+        '#required' => TRUE,
+
+    );
+    $form['phase'] = array(
+        '#title' => 'Phase',
+        '#type' => 'textfield',
+        '#description' => t('Please enter a Phase.'),
+        // '#element_validate' => array('element_validate_cipher'),
+        '#required' => TRUE,
+
+    );
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => 'cipher',
+    );
+
+    return $form;
+}
+
+
+function cipher_form_submit($form, &$form_state) {
+
+    // getting values input in  from form.
+    $shift = $form_state['values']['shift_value'];
+    $direction_shift = $form_state['values']['direction'];
+    $phrases = explode(" ", strtolower($form_state['values']['phase']));
+
+
+     $letter = range('a', 'z');
+     $reverse_letter = array_flip($letter);
+
+     $cipher_array = array();
+
+     foreach ($phrases as $phrase) {
+
+       $x = strlen($phrase);
+       $result_output = "";
+
+       for ($i = 0; $i <$x; $i++) {
+
+         if($direction_shift == 2) {
+           $result_output .= $letter[($reverse_letter[$phrase[$i]] + $shift) % 26];
+         }
+         if($direction_shift == 1){
+           $result_output .= $letter[(26 + $reverse_letter[$phrase[$i]] - $shift) % 26];
+         }
+       }
+       array_push($cipher_array, $result_output);
+       $cipher_phase = implode(" ", $cipher_array);
+     }
+     $_SESSION['output'] = "Here are your cipher:  " . $cipher_phase;
+     $form_state['redirect'] ='result';
+}
+
+function cipher_result(){
+  return $_SESSION['output'];
+
+}

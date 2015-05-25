@@ -1,0 +1,5 @@
+name = Cipher
+description = Encypts user input using a Shift Cipher
+package = bountham
+core = 7.x
+files[] = cipher.modle
