@@ -41,7 +41,7 @@ function cipher_form() {
         '#title' => 'Phase',
         '#type' => 'textfield',
         '#description' => t('Please enter a Phase.'),
-        // '#element_validate' => array('element_validate_cipher'),
+         '#element_validate' => array('element_validate_phrase'),
         '#required' => TRUE,
 
     );
@@ -51,6 +51,12 @@ function cipher_form() {
     );
 
     return $form;
+}
+
+function element_validate_phrase($element) {
+    if(preg_match('/[^a-zA-Z ,.!?;:-]/', $element['#value'])) {
+        form_error($element, t('supported Only letters, spaces, and punctuation.'));
+    }
 }
 
 
